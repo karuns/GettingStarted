@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="session_3_basic_grid/BasicRallyGrid"/>
+	<classpathentry kind="src" path="session_3_basic_grid/charts"/>
+	<classpathentry kind="src" path="session_4_interactive_grid/InteractiveGrid"/>
+	<classpathentry kind="src" path="session_5_grid_refactored/RefactoredGrid"/>
+	<classpathentry excluding="test/" kind="src" path="session_8_hackathon_dev_env/MyZzyzxApp"/>
+	<classpathentry kind="src" path="session_8_hackathon_dev_env/MyZzyzxApp/test"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

@@ -1,5 +1,5 @@
 
-Ext.define('CustomApp', {
+Ext.define('CustomApp2', {
     extend: 'Rally.app.App',      // The parent class manages the app 'lifecycle' and calls launch() when ready
     componentCls: 'app',          // CSS styles found in app.css
 
@@ -17,16 +17,33 @@ Ext.define('CustomApp', {
 
       });
 
-      this.add(this.pulldownContainer);
-      this._loadIterations();
+      this.gridContainer  = Ext.create('Ext.container.Container', {
+        layout: {
+            type: 'hbox',
+            align: 'stretch'
+        },
 
+      });
+
+      this.chartContainer  = Ext.create('Ext.container.Container', {
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            },
+
+      });
+
+      this.add(this.pulldownContainer);
+      this.add(this.chartContainer);
+      this.add(this.gridContainer);
+      this._loadIterations();
     },
 
     // Get data from Rally
 
     _loadIterations: function () {
       this.iterComboBox = Ext.create('Rally.ui.combobox.IterationComboBox' , {
-        fieldLabel:'Iterations',
+        fieldLabel:'Iteratione',
         labelAlign:'right',
         
         listeners: {
@@ -117,11 +134,10 @@ Ext.define('CustomApp', {
         ]
       });
 
-      this.add(this.myGrid);       // add the grid Component to the app-level Container (by doing this.add, it uses the app container)
-      console.log('what is this?', this);
+      this.gridContainer.add(this.myGrid);       // add the grid Component to the app-level Container (by doing this.add, it uses the app container)
+        this.chartContainer.add(this.myGrid);
+        console.log('what is this?', this);
 
     }
 
 });
-
-
