@@ -14,7 +14,7 @@ Ext.define('CustomApp', {
               type: 'hbox',
               align: 'stretch'
           },
-
+          width: 400,
       });
 
       this.add(this.pulldownContainer);
@@ -26,9 +26,9 @@ Ext.define('CustomApp', {
 
     _loadIterations: function () {
       this.iterComboBox = Ext.create('Rally.ui.combobox.IterationComboBox' , {
-        fieldLabel:'Iterations',
+        fieldLabel:'Iteration',
         labelAlign:'right',
-        
+
         listeners: {
             ready: function(combobox) {
                 this._loadSeverity();
@@ -123,5 +123,3 @@ Ext.define('CustomApp', {
     }
 
 });
-
-

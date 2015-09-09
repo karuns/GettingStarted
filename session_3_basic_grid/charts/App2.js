@@ -14,38 +14,21 @@ Ext.define('CustomApp2', {
               type: 'hbox',
               align: 'stretch'
           },
-
-      });
-
-      this.gridContainer  = Ext.create('Ext.container.Container', {
-        layout: {
-            type: 'hbox',
-            align: 'stretch'
-        },
-
-      });
-
-      this.chartContainer  = Ext.create('Ext.container.Container', {
-            layout: {
-                type: 'hbox',
-                align: 'stretch'
-            },
-
+          width: 400,
       });
 
       this.add(this.pulldownContainer);
-      this.add(this.chartContainer);
-      this.add(this.gridContainer);
       this._loadIterations();
+
     },
 
     // Get data from Rally
 
     _loadIterations: function () {
       this.iterComboBox = Ext.create('Rally.ui.combobox.IterationComboBox' , {
-        fieldLabel:'Iteratione',
+        fieldLabel:'Iterationss',
         labelAlign:'right',
-        
+
         listeners: {
             ready: function(combobox) {
                 this._loadSeverity();
@@ -134,9 +117,8 @@ Ext.define('CustomApp2', {
         ]
       });
 
-      this.gridContainer.add(this.myGrid);       // add the grid Component to the app-level Container (by doing this.add, it uses the app container)
-        this.chartContainer.add(this.myGrid);
-        console.log('what is this?', this);
+      this.add(this.myGrid);       // add the grid Component to the app-level Container (by doing this.add, it uses the app container)
+      console.log('what is this?', this);
 
     }
 
