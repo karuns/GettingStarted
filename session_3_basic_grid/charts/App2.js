@@ -26,7 +26,7 @@ Ext.define('CustomApp2', {
 
     _loadIterations: function () {
       this.iterComboBox = Ext.create('Rally.ui.combobox.IterationComboBox' , {
-        fieldLabel:'Iterationss',
+        fieldLabel:'Iterationsss',
         labelAlign:'right',
 
         listeners: {
