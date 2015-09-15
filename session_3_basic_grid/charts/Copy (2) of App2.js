@@ -21,7 +21,7 @@ Ext.define('CustomApp2', {
     },
 
     
-    /* Loading list of available chart */
+    /* Loading list of availble chart */
     _loadChartList: function () {
     	var charts = Ext.create('Ext.data.Store', {
     		 fields: ['abbr', 'name'],
@@ -53,34 +53,8 @@ Ext.define('CustomApp2', {
     },
     
     
-    _createChartContainer: function() {
-    	/* Creating pull down container first and adding to app */
-        this.chartContainer  = Ext.create('Ext.container.Container', {
-        	id:'cont',
-        	renderTo:Ext.getBody(),
-            layout: {
-                type: 'hbox',
-                align: 'middle'
-            },
-        });
-        this.add(this.chartContainer);
-    },
-    
-    _removeChartContainer: function() {
-    	if(this.chartContainer) {
-    		var elem = document.getElementById("cont");
-    		elem.remove();
-    		//this.remove(this.chartContainer);
-    	}
-    	this.chartContainer = null;
-    },
-    
     /* Load High charts */
-    _loadHighChart : function(chartType) {       
-    	this._removeChartContainer();
- 
-    	this._createChartContainer();
-    	
+    _loadHighChart : function(chartType) {
     	switch(chartType) {
     		case "BC": 
     			console.log("Loading Burndown chart ");
@@ -103,39 +77,18 @@ Ext.define('CustomApp2', {
     
     /* Load burn down chart */
     _loadBurnDownChart : function() {
-    	this.chart = {
-                xtype: 'rallychart',
-                project: Rally.util.Ref.getRelativeUri(this.getContext().getProject()),
-                projectScopeUp: this.getContext().getProjectScopeUp(),
-                projectScopeDown: this.getContext().getProjectScopeDown(),
-                width: 600,
-                height: 400,
-                storeConfig: {
-                    report: Rally.ui.report.StandardReport.Reports.Throughput,
-                    work_items: 'G,D',
-                    filter_field: 'ScheduleState'
-                }
-            },
-    	
-    	this.chartContainer.add(this.chart);
-    },
-    
-    _getData : function () {
-        // set filter and load
-        this.myDefectStore = Ext.create('Rally.data.wsapi.Store', {
-            model: 'Defect',
-            autoLoad: true,                         // <----- Don't forget to set this to true! heh
-            filters: myFilter,
-            listeners: {
-                load: function (myStore, myData, success) {
-                    console.log('got data!', myStore, myData)
-                    if(!this.myGrid) {
-                        this._createGrid(myStore);
-                    }// if we did NOT pass scope:this below, this line would be incorrectly trying to call _createGrid() on the store which does not exist.
-                },
-                scope: this                         // This tells the wsapi data store to forward pass along the app-level context into ALL listener functions
-            },
-            fetch: ['FormattedID', 'Name', 'Severity', 'Iteration']   // Look in the WSAPI docs online to see all fields available!
+    	this.add({
+            xtype: 'rallystandardreport',
+            project: Rally.util.Ref.getRelativeUri(this.getContext().getProject()),
+            projectScopeUp: this.getContext().getProjectScopeUp(),
+            projectScopeDown: this.getContext().getProjectScopeDown(),
+            width: 600,
+            height: 400,
+            reportConfig: {
+                report: Rally.ui.report.StandardReport.Reports.Throughput,
+                work_items: 'G,D',
+                filter_field: 'ScheduleState'
+            }
         });
     },
     
@@ -151,12 +104,11 @@ Ext.define('CustomApp2', {
     	        { 'name': 'metric five',  'data1': 4,  'data2': 4,  'data3': 36, 'data4': 13, 'data5': 33 }
     	    ]
     	});
-    	
+
     	this.chart = Ext.create('Ext.chart.Chart', {
     	    renderTo: Ext.getBody(),
-    	    width: 1000,
-    	    height: 600,
-    	    id: 'defect-trend-chart',
+    	    width: 500,
+    	    height: 300,
     	    animate: true,
     	    store: store,
     	    axes: [
@@ -215,99 +167,18 @@ Ext.define('CustomApp2', {
     	    ]
     	});
     	
-    	this.chartContainer.add(this.chart);
+    	this.add(this.chart);
     },
     
-    
-    /* Load Defect Trernd */
-    _loadPiBurnup : function() {
-    	var store = Ext.create('Ext.data.JsonStore', {
-    	    fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5'],
-    	    data: [
-    	        { 'name': 'metric one',   'data1': 10, 'data2': 12, 'data3': 14, 'data4': 8,  'data5': 13 },
-    	        { 'name': 'metric two',   'data1': 7,  'data2': 8,  'data3': 16, 'data4': 10, 'data5': 3  },
-    	        { 'name': 'metric three', 'data1': 5,  'data2': 2,  'data3': 14, 'data4': 12, 'data5': 7  },
-    	        { 'name': 'metric four',  'data1': 2,  'data2': 14, 'data3': 6,  'data4': 1,  'data5': 23 },
-    	        { 'name': 'metric five',  'data1': 4,  'data2': 4,  'data3': 36, 'data4': 13, 'data5': 33 }
-    	    ]
-    	});
-    	
-    	this.chart = Ext.create('Ext.chart.Chart', {
-    	    renderTo: Ext.getBody(),
-    	    width: 1000,
-    	    height: 600,
-    	    id: 'defect-trend-chart2',
-    	    animate: true,
-    	    store: store,
-    	    axes: [
-    	        {
-    	            type: 'Numeric',
-    	            position: 'left',
-    	            fields: ['data1', 'data2'],
-    	            label: {
-    	                renderer: Ext.util.Format.numberRenderer('0,0')
-    	            },
-    	            title: 'Sample Val',
-    	            grid: true,
-    	            minimum: 0
-    	        },
-    	        {
-    	            type: 'Category',
-    	            position: 'bottom',
-    	            fields: ['name'],
-    	            title: 'Sample Met'
-    	        }
-    	    ],
-    	    series: [
-    	        {
-    	            type: 'line',
-    	            highlight: {
-    	                size: 7,
-    	                radius: 7
-    	            },
-    	            axis: 'left',
-    	            xField: 'name',
-    	            yField: 'data1',
-    	            markerConfig: {
-    	                type: 'cross',
-    	                size: 4,
-    	                radius: 4,
-    	                'stroke-width': 0
-    	            }
-    	        },
-    	        {
-    	            type: 'line',
-    	            highlight: {
-    	                size: 7,
-    	                radius: 7
-    	            },
-    	            axis: 'left',
-    	            fill: true,
-    	            xField: 'name',
-    	            yField: 'data2',
-    	            markerConfig: {
-    	                type: 'circle',
-    	                size: 4,
-    	                radius: 4,
-    	                'stroke-width': 0
-    	            }
-    	        }
-    	    ]
-    	});
-    	
-    	this.chartContainer.add(this.chart);
-    },
     
     /* Load PI burnup */
-    _loadPiBurnups : function() {
-        	
-    	this.chart = {
-                xtype: 'rallychart',
-                loadMask: true,
-                chartData: this._getChartData(),
-                chartConfig: this._getChartConfig()
-            },
-            this.chartContainer.add(this.chart);
+    _loadPiBurnup : function() {
+    	 this.add({
+             xtype: 'rallychart',
+             loadMask: false,
+             chartData: this._getChartData(),
+             chartConfig: this._getChartConfig()
+         });
     },
     
     _getChartData: function() {
