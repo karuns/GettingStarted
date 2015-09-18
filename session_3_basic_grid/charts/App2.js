@@ -1,88 +1,5 @@
-//var PI_OID = 290183010; //The ObjectID of the PI on which to burn
-//
-//Ext.define('Rally.example.BurnCalculator', {
-//    extend: 'Rally.data.lookback.calculator.TimeSeriesCalculator',
-////    config: {
-////        completedScheduleStateNames: ['Accepted']
-////    },
-//
-//    constructor: function(config) {
-//        this.initConfig(config);
-//        this.callParent(arguments);
-//    },
-//
-//    getDerivedFieldsOnInput: function() {
-//        var completedScheduleStateNames = this.getCompletedScheduleStateNames();
-//        return [
-//            {
-//                "as": "Planned",
-//                "f": function(snapshot) {
-//                    if (snapshot.PlanEstimate) {
-//                        return snapshot.PlanEstimate;
-//                    }
-//
-//                    return 0;
-//                }
-//            },
-//            {
-////                "as": "PlannedCompleted",
-//                "as": "Planned",
-//                "f": function(snapshot) {
-//                    if (_.contains(completedScheduleStateNames, snapshot.ScheduleState) && snapshot.PlanEstimate) {
-//                        return snapshot.PlanEstimate;
-//                    }
-//
-//                    return 0;
-//                }
-//            }
-//        ];
-//    },
-//
-//    getMetrics: function() {
-//        return [
-//            {
-//                "field": "Planned",
-//                "as": "Planned",
-//                "display": "line",
-//                "f": "sum"
-//            },
-//            {
-//                "field": "PlannedCompleted",
-//                "as": "Completed",
-//                "f": "sum",
-//                "display": "column"
-//            }
-//        ];
-//    }
-//});
 
-Ext.define('Rally.example.CFDCalculator', {
-    extend: 'Rally.data.lookback.calculator.TimeSeriesCalculator',
-    config: {
-        stateFieldName: 'ScheduleState',
-        stateFieldValues: ['Defined', 'In-Progress', 'Completed', 'Accepted']
-    },
-
-    constructor: function(config) {
-        this.initConfig(config);
-        this.callParent(arguments);
-    },
-
-    getMetrics: function() {
-        return _.map(this.getStateFieldValues(), function(stateFieldValue) {
-            return  {
-                as: stateFieldValue,
-                groupByField: this.getStateFieldName(),
-                allowedValues: [stateFieldValue],
-                f: 'groupByCount',
-                display: 'area'
-            };
-        }, this);
-    }
-});
-
-
-Ext.define('CustomApp2', {
+Ext.define('CustomApp', {
     extend: 'Rally.app.App',      // The parent class manages the app 'lifecycle' and calls launch() when ready
     componentCls: 'app',          // CSS styles found in app.css
     requires: [
@@ -189,45 +106,6 @@ Ext.define('CustomApp2', {
     	}
     },
     
-    //* Load individual charts *//
-    
-//    /* Load burn down chart */
-//    _loadBurnDownChart : function() {
-//    	this.chart = {
-//                xtype: 'rallychart',
-//                project: Rally.util.Ref.getRelativeUri(this.getContext().getProject()),
-//                projectScopeUp: this.getContext().getProjectScopeUp(),
-//                projectScopeDown: this.getContext().getProjectScopeDown(),
-//                width: 600,
-//                height: 400,
-//                storeConfig: {
-//                    report: Rally.ui.report.StandardReport.Reports.Throughput,
-//                    work_items: 'G,D',
-//                    filter_field: 'ScheduleState'
-//                }
-//            },
-//    	
-//    	this.chartContainer.add(this.chart);
-//    },
-    
-    _getData : function () {
-        // set filter and load
-        this.myDefectStore = Ext.create('Rally.data.wsapi.Store', {
-            model: 'Defect',
-            autoLoad: true,                         // <----- Don't forget to set this to true! heh
-            filters: myFilter,
-            listeners: {
-                load: function (myStore, myData, success) {
-                    console.log('got data!', myStore, myData)
-                    if(!this.myGrid) {
-                        this._createGrid(myStore);
-                    }// if we did NOT pass scope:this below, this line would be incorrectly trying to call _createGrid() on the store which does not exist.
-                },
-                scope: this                         // This tells the wsapi data store to forward pass along the app-level context into ALL listener functions
-            },
-            fetch: ['FormattedID', 'Name', 'Severity', 'Iteration']   // Look in the WSAPI docs online to see all fields available!
-        });
-    },
     
     /* Load Defect Trernd */
     _loadDefectTrend : function() {
@@ -329,67 +207,66 @@ Ext.define('CustomApp2', {
     },
     
     
-    /**
-     * Generate the store config to retrieve all snapshots for stories and defects in the current project scope
-     * within the last 30 days
-     */
-    _getStoreConfig: function() {
-        return {
-            find: {
-                _TypeHierarchy: { '$in' : [ 'Defect' ] },
-                Children: null,
-                _ProjectHierarchy: this.getContext().getProject().ObjectID,
-                _ValidFrom: {'$gt': Rally.util.DateTime.toIsoString(Rally.util.DateTime.add(new Date(), 'day', -120)) }
-            },
-            fetch: ['ScheduleState'],
-            hydrate: ['ScheduleState'],
-            sort: {
-                _ValidFrom: 1
-            },
-            context: this.getContext().getDataContext(),
-            limit: Infinity
-        };
-    },
-
-    /**
-     * Generate a valid Highcharts configuration object to specify the chart
-     */
-    _getChartConfig: function() {
-        return {
-            chart: {
-                zoomType: 'xy'
-            },
-            title: {
-                text: 'Project Cumulative Flow'
-            },
-            xAxis: {
-                tickmarkPlacement: 'on',
-                tickInterval: 20,
-                title: {
-                    text: 'Date'
-                }
-            },
-            yAxis: [
-                {
-                    title: {
-                        text: 'Count'
-                    }
-                }
-            ],
-            plotOptions: {
-                series: {
-                    marker: {
-                        enabled: false
-                    }
-                },
-                area: {
-                    stacking: 'normal'
-                }
-            }
-        };
-    }
-
-
+	    /**
+	     * Generate the store config to retrieve all snapshots for stories and defects in the current project scope
+	     * within the last 30 days
+	     */
+	    _getStoreConfig: function() {
+	        return {
+	            find: {
+	                _TypeHierarchy: { '$in' : [ 'Defect' ] },
+	                Children: null,
+	                _ProjectHierarchy: this.getContext().getProject().ObjectID,
+	                _ValidFrom: {'$gt': Rally.util.DateTime.toIsoString(Rally.util.DateTime.add(new Date(), 'day', -120)) }
+	            },
+	            fetch: ['ScheduleState'],
+	            hydrate: ['ScheduleState'],
+	            sort: {
+	                _ValidFrom: 1
+	            },
+	            context: this.getContext().getDataContext(),
+	            limit: Infinity
+	        };
+	    },
+	
+	    
+	    /**
+	     * Generate a valid Highcharts configuration object to specify the chart
+	     */
+	    _getChartConfig: function() {
+	        return {
+	            chart: {
+	                zoomType: 'xy'
+	            },
+	            title: {
+	                text: 'Project Cumulative Flow'
+	            },
+	            xAxis: {
+	                tickmarkPlacement: 'on',
+	                tickInterval: 20,
+	                title: {
+	                    text: 'Date'
+	                }
+	            },
+	            yAxis: [
+	                {
+	                    title: {
+	                        text: 'Count'
+	                    }
+	                }
+	            ],
+	            plotOptions: {
+	                series: {
+	                    marker: {
+	                        enabled: false
+	                    }
+	                },
+	                area: {
+	                    stacking: 'normal'
+	                }
+	            }
+	        };
+	    }
     
 //    /* Load PI burnup */
 //    _loadPiBurnups : function() {
@@ -582,6 +459,44 @@ Ext.define('CustomApp2', {
 //      console.log('what is this?', this);
 //
 //    }
+    
+//  /* Load burn down chart */
+//  _loadBurnDownChart : function() {
+//  	this.chart = {
+//              xtype: 'rallychart',
+//              project: Rally.util.Ref.getRelativeUri(this.getContext().getProject()),
+//              projectScopeUp: this.getContext().getProjectScopeUp(),
+//              projectScopeDown: this.getContext().getProjectScopeDown(),
+//              width: 600,
+//              height: 400,
+//              storeConfig: {
+//                  report: Rally.ui.report.StandardReport.Reports.Throughput,
+//                  work_items: 'G,D',
+//                  filter_field: 'ScheduleState'
+//              }
+//          },
+//  	
+//  	this.chartContainer.add(this.chart);
+//  },
+	    //* Load individual charts *//    
+//	    _getData : function () {
+//	        // set filter and load
+//	        this.myDefectStore = Ext.create('Rally.data.wsapi.Store', {
+//	            model: 'Defect',
+//	            autoLoad: true,                         // <----- Don't forget to set this to true! heh
+//	            filters: myFilter,
+//	            listeners: {
+//	                load: function (myStore, myData, success) {
+//	                    console.log('got data!', myStore, myData)
+//	                    if(!this.myGrid) {
+//	                        this._createGrid(myStore);
+//	                    }// if we did NOT pass scope:this below, this line would be incorrectly trying to call _createGrid() on the store which does not exist.
+//	                },
+//	                scope: this                         // This tells the wsapi data store to forward pass along the app-level context into ALL listener functions
+//	            },
+//	            fetch: ['FormattedID', 'Name', 'Severity', 'Iteration']   // Look in the WSAPI docs online to see all fields available!
+//	        });
+//	    },
 
 });
 
