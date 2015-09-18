@@ -114,6 +114,7 @@ Ext.define('CustomApp2', {
     		        {"abbr":"BC", "name":"Burndown Chart"},
     		        {"abbr":"DT", "name":"Defect Trend"},  
     		        {"abbr":"PB", "name":"PI Burnup"},  
+    		        {"abbr":"PC", "name":"Project Cumulative Flow"},  
     		    ]
     	});
     	
@@ -147,8 +148,6 @@ Ext.define('CustomApp2', {
                 type: 'hbox',
                 align: 'middle'
             },
-//    	    width: 1500,
-//    	    height: 600,
         });
         this.add(this.chartContainer);
     },
@@ -181,6 +180,10 @@ Ext.define('CustomApp2', {
     			console.log("Loading PI Burnup ");
     			this._loadPiBurnup();
     			break;
+       		case "PC":
+    			console.log("Loading project cumulative flow ..");
+    			this._loadProjectCumulative();
+    			break;
     		default:
     			console.log("Loading Burndown chart ");
     	}
@@ -188,24 +191,24 @@ Ext.define('CustomApp2', {
     
     //* Load individual charts *//
     
-    /* Load burn down chart */
-    _loadBurnDownChart : function() {
-    	this.chart = {
-                xtype: 'rallychart',
-                project: Rally.util.Ref.getRelativeUri(this.getContext().getProject()),
-                projectScopeUp: this.getContext().getProjectScopeUp(),
-                projectScopeDown: this.getContext().getProjectScopeDown(),
-                width: 600,
-                height: 400,
-                storeConfig: {
-                    report: Rally.ui.report.StandardReport.Reports.Throughput,
-                    work_items: 'G,D',
-                    filter_field: 'ScheduleState'
-                }
-            },
-    	
-    	this.chartContainer.add(this.chart);
-    },
+//    /* Load burn down chart */
+//    _loadBurnDownChart : function() {
+//    	this.chart = {
+//                xtype: 'rallychart',
+//                project: Rally.util.Ref.getRelativeUri(this.getContext().getProject()),
+//                projectScopeUp: this.getContext().getProjectScopeUp(),
+//                projectScopeDown: this.getContext().getProjectScopeDown(),
+//                width: 600,
+//                height: 400,
+//                storeConfig: {
+//                    report: Rally.ui.report.StandardReport.Reports.Throughput,
+//                    work_items: 'G,D',
+//                    filter_field: 'ScheduleState'
+//                }
+//            },
+//    	
+//    	this.chartContainer.add(this.chart);
+//    },
     
     _getData : function () {
         // set filter and load
@@ -307,7 +310,7 @@ Ext.define('CustomApp2', {
     
     
     /* Load Defect Trernd */
-    _loadPiBurnup : function() {	
+    _loadProjectCumulative : function() {	
     	this.chart = {
                 xtype: 'rallychart',
                 storeType: 'Rally.data.lookback.SnapshotStore',
@@ -323,7 +326,6 @@ Ext.define('CustomApp2', {
             };
 
     	this.chartContainer.add(this.chart);
-//    	this.add(this.chart);
     },
     
     
